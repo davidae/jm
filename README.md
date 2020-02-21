@@ -2,9 +2,9 @@
 [![GoDoc](https://godoc.org/github.com/davidae/jm?status.svg)](https://godoc.org/github.com/davidae/jm)
 [![Build Status](https://travis-ci.com/davidae/jm.svg "Travis CI status")](https://travis-ci.com/davidae/jm)
 
-A small package to compare JSONs with the advantage of using placeholders for possible unknown values. 
-It should work with any type of valid JSON - however nested and tangled it may be. The package only uses 
-golangs standard library, no dependencies.
+A small package to match JSONs with the addition of using placeholders for possible unknown values. 
+It should work with any type of valid JSON - however nested and tangled it may be. This package uses only 
+golang's standard library, no dependencies.
 
 # Installation
 ```Shell
@@ -32,7 +32,7 @@ err := jm.Match(
     []byte(`{"created_at": "2009-11-10T23:00:00Z"}`),
     jm.WithTimeLayout(time.RFC3339))
 
-fmt.Println("we should not have an error here: %t", err == nil)
+fmt.Printf("we should not have an error here: %t", err == nil)
 ```
 It is also possible to define your own custom placeholders,
 ```go
@@ -55,7 +55,7 @@ err := jm.Match(
     },
 )
 
-fmt.Println("we should not have an error here: %t", err == nil)	
+fmt.Printf("we should not have an error here: %t", err == nil)	
 ```
 
 ## Errors
