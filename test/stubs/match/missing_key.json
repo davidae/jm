@@ -1,0 +1,13 @@
+{
+	"sample": {
+		"an_int": 12,
+		"a_float": 32.3,
+		"nested": {
+            "triple": false,
+			"double": {
+                "arr_1": ["A", "B"],
+				"arr_2": ["A", 1, [{},[2]]]
+			}
+		}
+	}
+}
