@@ -125,12 +125,12 @@ func TestEqualWithCustomPlaceholder(t *testing.T) {
 }
 
 func TestEmptyBytes(t *testing.T) {
-	err := Match([]byte{}, []byte{})
-	if err == nil {
-		t.Error("expected an error, but nil was returned")
-	}
+	expectedErrMsg := "unexpected end of JSON input"
 
-	if err.Error() != "unexpected end of JSON input" {
+	if err := Match([]byte{}, []byte{}); err == nil {
+		t.Error("expected an error, but nil was returned")
+	} else if err.Error() != expectedErrMsg {
+		t.Errorf("expected error message %s to be, but got %s", expectedErrMsg, err)
 	}
 }
 
