@@ -1,4 +1,7 @@
 # jm - jsonMatch
+[![GoDoc](https://godoc.org/github.com/davidae/jm?status.svg)](https://godoc.org/github.com/davidae/jm)
+[![Build Status](https://travis-ci.com/davidae/jm.svg "Travis CI status")](https://travis-ci.com/davidae/jm)
+
 A small package to compare JSONs with the advantage of using placeholders for possible unknown values. 
 It should work with any type of valid JSON - however nested and tangled it may be. The package only uses 
 golangs standard library, no dependencies.
