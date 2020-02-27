@@ -70,7 +70,6 @@ func isEmpty(i interface{}) bool {
 	}
 
 	val := reflect.ValueOf(i)
-
 	switch val.Kind() {
 	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice:
 		return val.Len() == 0
@@ -78,10 +77,9 @@ func isEmpty(i interface{}) bool {
 		if val.IsNil() {
 			return true
 		}
-		deref := val.Elem().Interface()
-		return isEmpty(deref)
+
+		return isEmpty(val.Elem().Interface())
 	default:
-		zero := reflect.Zero(val.Type())
-		return reflect.DeepEqual(i, zero.Interface())
+		return reflect.DeepEqual(i, reflect.Zero(val.Type()).Interface())
 	}
 }
