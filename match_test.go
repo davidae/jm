@@ -31,7 +31,7 @@ func TestNotEqualJSONWithMismatchValue(t *testing.T) {
 	var (
 		expected       = mustReadFile(t, "test/stubs/match/expected.json")
 		actual         = mustReadFile(t, "test/stubs/match/mismatch_value.json")
-		expectedErrMsg = `mismatch under key arr_2: value 2 and "hex": values are not equal`
+		expectedErrMsg = `value 2 and "hex": values are not equal`
 	)
 
 	if err := Match(expected, actual); err == nil {
@@ -59,7 +59,7 @@ func TestNotEqualJSONWithMissingKey(t *testing.T) {
 	var (
 		expected       = mustReadFile(t, "test/stubs/match/expected.json")
 		actual         = mustReadFile(t, "test/stubs/match/missing_key.json")
-		expectedErrMsg = `mismatch under key double: key "nothing" is not present in actual JSON: missing key`
+		expectedErrMsg = `key "nothing" is not present in actual JSON: missing key`
 	)
 
 	if err := Match(expected, actual); err == nil {
@@ -73,7 +73,7 @@ func TestNotEqualJSONWithUnexpectedKey(t *testing.T) {
 	var (
 		expected       = mustReadFile(t, "test/stubs/match/expected.json")
 		actual         = mustReadFile(t, "test/stubs/match/unexpected_key.json")
-		expectedErrMsg = `mismatch under key double: key "wait_for_me" is only present in actual JSON: unknown key`
+		expectedErrMsg = `key "wait_for_me" is only present in actual JSON: unknown key`
 	)
 
 	if err := Match(expected, actual); err == nil {

@@ -47,7 +47,7 @@ func TestNestedJSONAndCustomPlaceholder(t *testing.T) {
 		}
 	}
 
-	expectedErrStr := "mismatch under key arr_2: 2.999800 is not greater or equal than 3"
+	expectedErrStr := "placeholder $GTE_3 match failed: 2.999800 is not greater or equal than 3"
 
 	err := Match([]byte(nestedExpectedJSON), []byte(nestedActualJSON), gte3)
 	if err == nil {
@@ -68,7 +68,7 @@ func TestWithNotEmptyPlaceholderWhenMatch(t *testing.T) {
 }
 
 func TestWithNotEmptyPlaceholderWhenEmpty(t *testing.T) {
-	expectedErrStr := "mismatch under key name: expected value to be not empty, but it was"
+	expectedErrStr := "placeholder $NOT_EMPTY match failed: expected value to be not empty, but it was"
 	err := Match(
 		[]byte(`{"name": "$NOT_EMPTY"}`),
 		[]byte(`{"name": ""}`),
@@ -92,7 +92,7 @@ func TestWithTimeLayoutWhenMatch(t *testing.T) {
 }
 
 func TestWithTimeLayoutWhenInvalidTimeString(t *testing.T) {
-	expectedErrStr := "mismatch under key created_at: cannot parse time, value is of type bool - not a string"
+	expectedErrStr := "placeholder $TIME_RFC3339 match failed: cannot parse time, value is of type bool - not a string"
 	err := Match(
 		[]byte(`{"created_at": "$TIME_RFC3339"}`),
 		[]byte(`{"created_at": false}`),
@@ -106,7 +106,7 @@ func TestWithTimeLayoutWhenInvalidTimeString(t *testing.T) {
 }
 
 func TestWithTimeLayoutWhenInvalidTimeFormat(t *testing.T) {
-	expectedErrStr := "mismatch under key created_at: cannot parse layout \"2006-01-02T15:04:05Z07:00\" with \"hello\""
+	expectedErrStr := "placeholder $TIME_RFC3339 match failed: cannot parse layout \"2006-01-02T15:04:05Z07:00\" with \"hello\""
 	err := Match(
 		[]byte(`{"created_at": "$TIME_RFC3339"}`),
 		[]byte(`{"created_at": "hello"}`),
@@ -130,7 +130,7 @@ func TestWithRegexpWhenMatch(t *testing.T) {
 }
 func TestWithRegexpWhenMatchWithInvalidRegexString(t *testing.T) {
 	re := regexp.MustCompile("^2")
-	expectedErrStr := "mismatch under key uuid: cannot match, value is of type float64 - not a string"
+	expectedErrStr := "placeholder $UUID match failed: cannot match, value is of type float64 - not a string"
 
 	err := Match([]byte(`{"uuid": "$UUID"}`), []byte(`{"uuid": 1}`), WithRegexp("$UUID", re))
 	if err == nil {
@@ -142,7 +142,7 @@ func TestWithRegexpWhenMatchWithInvalidRegexString(t *testing.T) {
 
 func TestWithRegexpWhenMatchWithNoMatch(t *testing.T) {
 	re := regexp.MustCompile("^2")
-	expectedErrStr := "mismatch under key uuid: value z does not match with regexp ^2"
+	expectedErrStr := "placeholder $UUID match failed: value z does not match with regexp ^2"
 
 	err := Match(
 		[]byte(`{"uuid": "$UUID"}`),

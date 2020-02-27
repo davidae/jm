@@ -35,51 +35,43 @@ func Match(expected, actual []byte, placeholders ...Placeholder) error {
 		return err
 	}
 
-	if key, err := isEqual(exp, act, "", placeholders...); err != nil {
-		if key != "" {
-			return fmt.Errorf("mismatch under key %s: %w", key, err)
-		}
-
-		return err
-	}
-
-	return nil
+	return isEqual(exp, act, "", placeholders...)
 }
 
-func isEqual(expected, actual interface{}, key string, ph ...Placeholder) (string, error) {
+func isEqual(expected, actual interface{}, key string, ph ...Placeholder) error {
 	if ea, aa, ok := isArray(expected, actual); ok {
 		l, err := areLenEqual(ea, aa)
 		if err != nil {
-			return key, err
+			return errUnderKey(err, key)
 		}
 
 		for i := 0; i < l; i++ {
-			if key, err := isEqual(ea[i], aa[i], key, ph...); err != nil {
-				return key, err
+			if err := isEqual(ea[i], aa[i], key, ph...); err != nil {
+				return err
 			}
 		}
 
-		return "", nil
+		return nil
 	}
 
 	if eo, ao, ok := isObject(expected, actual); ok {
 		if err := areKeysEqual(eo, ao); err != nil {
-			return key, err
+			return err
 		}
 		for k := range eo {
-			if key, err := isEqual(eo[k], ao[k], k, ph...); err != nil {
-				return key, err
+			if err := isEqual(eo[k], ao[k], k, ph...); err != nil {
+				return err
 			}
 		}
 
-		return "", nil
+		return nil
 	}
 
 	if err := isEqualValue(expected, actual, ph); err != nil {
-		return key, err
+		return err
 	}
 
-	return "", nil
+	return nil
 }
 
 func isEqualValue(expected, actual interface{}, ph []Placeholder) error {
@@ -91,7 +83,7 @@ func isEqualValue(expected, actual interface{}, ph []Placeholder) error {
 
 		if key, fn := p(); key == expectedStr {
 			if err := fn(actual); err != nil {
-				return err
+				return fmt.Errorf("placeholder %s match failed: %w", key, err)
 			}
 
 			return nil
@@ -168,4 +160,12 @@ func areKeysEqual(expected, actual map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+func errUnderKey(err error, key string) error {
+	if key != "" {
+		return fmt.Errorf("mismatch under key %s: %w", key, err)
+	}
+
+	return err
 }
