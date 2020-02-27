@@ -36,7 +36,11 @@ func Match(expected, actual []byte, placeholders ...Placeholder) error {
 	}
 
 	if key, err := isEqual(exp, act, "", placeholders...); err != nil {
-		return fmt.Errorf("mismatch under key %s: %w", key, err)
+		if key != "" {
+			return fmt.Errorf("mismatch under key %s: %w", key, err)
+		}
+
+		return err
 	}
 
 	return nil

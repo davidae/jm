@@ -28,9 +28,9 @@ equal.
 You can use placeholders in the expected JSON when it is hard to determine the actual value, such as
 ```go
 err := jm.Match(
-    []byte(`{"created_at": "$TIME_LAYOUT"}`),
+    []byte(`{"created_at": "$TIME_RFC3339"}`),
     []byte(`{"created_at": "2009-11-10T23:00:00Z"}`),
-    jm.WithTimeLayout(time.RFC3339))
+    jm.WithTimeLayout("$TIME_RFC3339", time.RFC3339))
 
 fmt.Printf("we should not have an error here: %t", err == nil)
 ```

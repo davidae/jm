@@ -1,7 +1,6 @@
 package jm
 
 import (
-	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -81,46 +80,6 @@ func TestNotEqualJSONWithUnexpectedKey(t *testing.T) {
 		t.Error("expected an error, but nil was returned")
 	} else if err.Error() != expectedErrMsg {
 		t.Errorf("expected error message %s to be, but got %s", expectedErrMsg, err)
-	}
-}
-
-func TestNotEqualJSONWithNotEmptyPlaceholder(t *testing.T) {
-	var (
-		expected = mustReadFile(t, "test/stubs/placeholder/with_not_empty.json")
-		actual   = mustReadFile(t, "test/stubs/placeholder/actual.json")
-	)
-
-	if err := Match(expected, actual, WithNotEmpty()); err != nil {
-		t.Errorf("unexpected error, expected JSON to be equal itself: %s", err)
-	}
-}
-
-func TestEqualWithCustomPlaceholder(t *testing.T) {
-	gte3 := func() (string, func(interface{}) error) {
-		return "$GTE_3", func(val interface{}) error {
-			valFloat, ok := val.(float64)
-			if !ok {
-				return fmt.Errorf("expected value to compare to be an float64 but got: %T", val)
-			}
-
-			if valFloat >= 3 {
-				return nil
-			}
-
-			return fmt.Errorf("%f is not greater or equal than 3", valFloat)
-		}
-	}
-
-	if err := Match(
-		[]byte(`{"value": "$GTE_3"}`),
-		[]byte(`{"value": 3}`), gte3); err != nil {
-		t.Errorf("unexpected error: %s", err)
-	}
-
-	if err := Match(
-		[]byte(`{"value": "$GTE_3"}`),
-		[]byte(`{"value": 2}`), gte3); err == nil {
-		t.Error("expected an error, but it was nil")
 	}
 }
 

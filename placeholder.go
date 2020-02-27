@@ -1,6 +1,7 @@
 package jm
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -11,14 +12,13 @@ import (
 // in the actual JSON by assigning .
 type Placeholder func() (string, func(actualValue interface{}) error)
 
-// WithNotEmpty is a Placeholder function that looks for '$NOT_EMPTY' as a
-// placeholder value in the expected JSON and confirms the actual value is
-// not empty.
-func WithNotEmpty() Placeholder {
+// WithNotEmpty looks for a placeholder value in the expected JSON
+// and confirms the actual value is not empty.
+func WithNotEmpty(placeholder string) Placeholder {
 	return func() (string, func(interface{}) error) {
-		return "$NOT_EMPTY", func(val interface{}) error {
+		return placeholder, func(val interface{}) error {
 			if isEmpty(val) {
-				return fmt.Errorf("unexpected empty value for placeholder $NOT_EMPTY")
+				return errors.New("expected value to be not empty, but it was")
 			}
 
 			return nil
@@ -26,39 +26,40 @@ func WithNotEmpty() Placeholder {
 	}
 }
 
-// WithRegexp is a Placeholder function that looks for '$MATCHES_REGEXP' as a
-// placeholder value in the expected JSON and confirms the actual value is
-// matches the given regular expression.
-func WithRegexp(re *regexp.Regexp) Placeholder {
+// WithRegexp looks for the placeholder value in the expected JSON and confirms the
+// actual value matches the given regular expression.
+func WithRegexp(placeholder string, re *regexp.Regexp) Placeholder {
 	return func() (string, func(interface{}) error) {
-		return "$MATCHES_REGEXP", func(val interface{}) error {
+		return placeholder, func(val interface{}) error {
 			str, ok := val.(string)
 			if !ok {
-				return fmt.Errorf("cannot match string, value %#v is not a string, it is of type %T", val, val)
+				return fmt.Errorf("cannot match, value is of type %T - not a string", val)
 			}
 
 			if re.MatchString(str) {
 				return nil
 			}
 
-			return fmt.Errorf("")
+			return fmt.Errorf("value %s does not match with regexp %s", str, re)
 		}
 	}
 }
 
-// WithTimeLayout is a Placeholder function that looks for '$TIME_LAYOUT' as a
-// placeholder value in the expected JSON and confirms the actual value
-// matches the given time layout format
-func WithTimeLayout(layout string) Placeholder {
+// WithTimeLayout looks for the placeholder value in the expected JSON
+// and confirms the actual value matches the given time layout format
+func WithTimeLayout(placeholder, layout string) Placeholder {
 	return func() (string, func(interface{}) error) {
-		return "$TIME_LAYOUT", func(val interface{}) error {
+		return placeholder, func(val interface{}) error {
 			str, ok := val.(string)
 			if !ok {
-				return fmt.Errorf("cannot parse time string, %#v is not a string; it is of type %T", val, val)
+				return fmt.Errorf("cannot parse time, value is of type %T - not a string", val)
 			}
 
-			_, err := time.Parse(layout, str)
-			return err
+			if _, err := time.Parse(layout, str); err != nil {
+				return fmt.Errorf("cannot parse layout %q with %q", layout, str)
+			}
+
+			return nil
 		}
 	}
 }
