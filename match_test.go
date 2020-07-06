@@ -3,6 +3,7 @@ package jm
 import (
 	"io/ioutil"
 	"testing"
+	"time"
 )
 
 func TestEqualJSON(t *testing.T) {
@@ -78,6 +79,34 @@ func TestNotEqualJSONWithUnexpectedKey(t *testing.T) {
 
 	if err := Match(expected, actual); err == nil {
 		t.Error("expected an error, but nil was returned")
+	} else if err.Error() != expectedErrMsg {
+		t.Errorf("expected error message %s to be, but got %s", expectedErrMsg, err)
+	}
+}
+
+func TestEqualWithIntegerMismatch(t *testing.T) {
+	var (
+		expected       = `{"id": "1","count":2}`
+		actual         = `{"id": "1","count":4}`
+		expectedErrMsg = "value 2 and 4: values are not equal"
+	)
+
+	if err := Match([]byte(expected), []byte(actual), WithTimeLayout("$TIME_RFC3339", time.RFC3339)); err == nil {
+		t.Error("expected a mismatch on 'count'")
+	} else if err.Error() != expectedErrMsg {
+		t.Errorf("expected error message %s to be, but got %s", expectedErrMsg, err)
+	}
+}
+
+func TestEqualWithArrayIntegerMismatch(t *testing.T) {
+	var (
+		expected       = `{"id": "1","count":[1,2,3,4,5,6]}`
+		actual         = `{"id": "1","count":[1,2,3,4,"s",6]}`
+		expectedErrMsg = `value 5 and "s": values are not equal`
+	)
+
+	if err := Match([]byte(expected), []byte(actual), WithTimeLayout("$TIME_RFC3339", time.RFC3339)); err == nil {
+		t.Error("expected a mismatch on 'count'")
 	} else if err.Error() != expectedErrMsg {
 		t.Errorf("expected error message %s to be, but got %s", expectedErrMsg, err)
 	}

@@ -78,7 +78,7 @@ func isEqualValue(expected, actual interface{}, ph []Placeholder) error {
 	for _, p := range ph {
 		expectedStr, ok := expected.(string)
 		if !ok {
-			return nil
+			continue
 		}
 
 		if key, fn := p(); key == expectedStr {
