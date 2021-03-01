@@ -35,22 +35,17 @@ func Match(expected, actual []byte, placeholders ...Placeholder) error {
 		return err
 	}
 
+	d, _ := json.Marshal(act)
+	fmt.Printf("actual remarshal: %s\n", string(d))
+
 	return isEqual(exp, act, "", placeholders...)
 }
 
 func isEqual(expected, actual interface{}, key string, ph ...Placeholder) error {
-	if ea, aa, ok := isArray(expected, actual); ok {
-		l, err := areLenEqual(ea, aa)
-		if err != nil {
+	if ea, aa, ok := isArray(expected, actual, ph); ok {
+		if err := matchArray(ea, aa, ph); err != nil {
 			return errUnderKey(err, key)
 		}
-
-		for i := 0; i < l; i++ {
-			if err := isEqual(ea[i], aa[i], key, ph...); err != nil {
-				return err
-			}
-		}
-
 		return nil
 	}
 
@@ -97,7 +92,7 @@ func isEqualValue(expected, actual interface{}, ph []Placeholder) error {
 	return nil
 }
 
-func isArray(i, j interface{}) ([]interface{}, []interface{}, bool) {
+func isArray(i, j interface{}, ph []Placeholder) ([]interface{}, []interface{}, bool) {
 	ia, ok := i.([]interface{})
 	if !ok {
 		return []interface{}{}, []interface{}{}, false
@@ -109,6 +104,50 @@ func isArray(i, j interface{}) ([]interface{}, []interface{}, bool) {
 	}
 
 	return ia, ja, true
+}
+
+func matchArray(listA, listB interface{}, ph []Placeholder) error {
+	if isEmpty(listA) && isEmpty(listB) {
+		return nil
+	}
+
+	aValue := reflect.ValueOf(listA)
+	bValue := reflect.ValueOf(listB)
+
+	aLen := aValue.Len()
+	bLen := bValue.Len()
+
+	if aLen != bLen {
+		return fmt.Errorf("mismatch array length %d and %d: %w", aLen, bLen, ErrArrayLengths)
+	}
+
+	visited := make([]bool, bLen)
+	for i := 0; i < aLen; i++ {
+		var err error
+		element := aValue.Index(i).Interface()
+		found := false
+		for j := 0; j < bLen; j++ {
+			if visited[j] {
+				continue
+			}
+			fmt.Printf("comparing %#v and %#v\n", bValue.Index(j).Interface(), element)
+			err = isEqual(bValue.Index(j).Interface(), element, "", ph...)
+			fmt.Printf("  compared %#v and %#v, is was %#v\n", bValue.Index(j).Interface(), element, err)
+			if err == nil {
+				visited[j] = true
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf(
+				"element %s appears more times in %s than in %s: %w",
+				marshalToJSON(element),
+				marshalToJSON(aValue.Interface()),
+				marshalToJSON(bValue.Interface()), err)
+		}
+	}
+	return nil
 }
 
 func isObject(i, j interface{}) (map[string]interface{}, map[string]interface{}, bool) {
@@ -168,4 +207,10 @@ func errUnderKey(err error, key string) error {
 	}
 
 	return err
+}
+
+func marshalToJSON(i interface{}) string {
+	d, _ := json.Marshal(i)
+	fmt.Printf("trying to marshal %#v, got %q\n", i, string(d))
+	return string(d)
 }
