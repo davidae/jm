@@ -108,11 +108,13 @@ func matchArray(listA, listB interface{}, ph []Placeholder) error {
 		return nil
 	}
 
-	aValue := reflect.ValueOf(listA)
-	bValue := reflect.ValueOf(listB)
+	var (
+		aValue = reflect.ValueOf(listA)
+		bValue = reflect.ValueOf(listB)
 
-	aLen := aValue.Len()
-	bLen := bValue.Len()
+		aLen = aValue.Len()
+		bLen = bValue.Len()
+	)
 
 	if aLen != bLen {
 		return fmt.Errorf("mismatch array length %d and %d: %w", aLen, bLen, ErrArrayLengths)
@@ -155,15 +157,6 @@ func isObject(i, j interface{}) (map[string]interface{}, map[string]interface{},
 	}
 
 	return io, jo, true
-}
-
-func areLenEqual(i, j []interface{}) (int, error) {
-	il, jl := len(i), len(j)
-	if il != jl {
-		return 0, fmt.Errorf("mismatch array length %d and %d: %w", il, jl, ErrArrayLengths)
-	}
-
-	return il, nil
 }
 
 type keyMatcher struct {
