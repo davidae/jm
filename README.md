@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/davidae/jm.svg "Travis CI status")](https://travis-ci.com/davidae/jm)
 
 A small package to match JSONs with the addition of using placeholders for possible unknown values. 
-It should work with any type of valid JSON - however nested and tangled it may be. This package uses only 
+It should work with any type of valid JSON - however nested, unordered, and tangled it may be. This package uses only 
 golang's standard library, no dependencies.
 
 # Installation

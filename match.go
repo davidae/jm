@@ -121,15 +121,15 @@ func matchArray(listA, listB interface{}, ph []Placeholder) error {
 	}
 
 	visited := make([]bool, bLen)
-	for i := 0; i < aLen; i++ {
+	for i := 0; i < bLen; i++ {
 		var err error
-		element := aValue.Index(i).Interface()
+		element := bValue.Index(i).Interface()
 		found := false
-		for j := 0; j < bLen; j++ {
+		for j := 0; j < aLen; j++ {
 			if visited[j] {
 				continue
 			}
-			if err = isEqual(bValue.Index(j).Interface(), element, "", ph...); err == nil {
+			if err := isEqual(aValue.Index(j).Interface(), element, "", ph...); err == nil {
 				visited[j] = true
 				found = true
 				break
