@@ -35,9 +35,6 @@ func Match(expected, actual []byte, placeholders ...Placeholder) error {
 		return err
 	}
 
-	d, _ := json.Marshal(act)
-	fmt.Printf("actual remarshal: %s\n", string(d))
-
 	return isEqual(exp, act, "", placeholders...)
 }
 
@@ -130,10 +127,7 @@ func matchArray(listA, listB interface{}, ph []Placeholder) error {
 			if visited[j] {
 				continue
 			}
-			fmt.Printf("comparing %#v and %#v\n", bValue.Index(j).Interface(), element)
-			err = isEqual(bValue.Index(j).Interface(), element, "", ph...)
-			fmt.Printf("  compared %#v and %#v, is was %#v\n", bValue.Index(j).Interface(), element, err)
-			if err == nil {
+			if err = isEqual(bValue.Index(j).Interface(), element, "", ph...); err == nil {
 				visited[j] = true
 				found = true
 				break
@@ -211,6 +205,5 @@ func errUnderKey(err error, key string) error {
 
 func marshalToJSON(i interface{}) string {
 	d, _ := json.Marshal(i)
-	fmt.Printf("trying to marshal %#v, got %q\n", i, string(d))
 	return string(d)
 }
